@@ -24,8 +24,8 @@ class AdminAll(generics.CreateAPIView):
 class AdminView(generics.CreateAPIView):
     #Obtener usuario por ID
     # Verifica que el usuario esté autenticado
-    permission_classes = (permissions.IsAuthenticated,)
     def get(self, request, *args, **kwargs):
+        permission_classes = (permissions.IsAuthenticated,)
         admin = get_object_or_404(Administradores, id = request.GET.get("id"))
         admin = AdminSerializer(admin, many=False).data
         # Si todo es correcto, regresamos la información
@@ -101,6 +101,7 @@ class AdminView(generics.CreateAPIView):
     # Eliminar admin con delete (Borrar realmente)
     @transaction.atomic
     def delete(self, request, *args, **kwargs):
+        permission_classes = (permissions.IsAuthenticated,)
         admin = get_object_or_404(Administradores, id=request.GET.get("id"))
         try:
             admin.user.delete()
