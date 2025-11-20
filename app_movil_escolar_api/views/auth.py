@@ -62,9 +62,7 @@ class Logout(generics.GenericAPIView):
 
     def get(self, request, *args, **kwargs):
 
-        print("logout")
         user = request.user
-        print(str(user))
         if user.is_active:
             token = Token.objects.get(user=user)
             token.delete()
