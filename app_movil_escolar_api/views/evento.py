@@ -13,12 +13,16 @@ from django.shortcuts import get_object_or_404
 
 
 class EventoAll(generics.CreateAPIView):
-    #Esta función es esencial para todo donde se requiera autorización de inicio de sesión (token)
     permission_classes = (permissions.IsAuthenticated,)
-    # Invocamos la petición GET para obtener todos los administradores
     def get(self, request, *args, **kwargs):
-        evento = Evento.objects.filter(user__is_active = 1).order_by("id")
+        evento = Evento.objects.all().order_by("id")
         lista = EventoSerializer(evento, many=True).data
+        for eventos in lista:
+            if isinstance(eventos,dict) and "publico_objetivo" in eventos:
+                try:
+                    eventos["publico_objetivo"] = json.loads(eventos["publico_objetivo"])
+                except Exception:
+                    eventos["publico_objetivo"] = []       
         return Response(lista, 200)
     
 class EventosView(generics.CreateAPIView):
@@ -53,34 +57,34 @@ class EventosView(generics.CreateAPIView):
         return Response({"evento_created_id": evento.id}, 201)
        
     
-    # Actualizar datos del maestro
-    # @transaction.atomic
-    # def put(self, request, *args, **kwargs):
-    #     permission_classes = (permissions.IsAuthenticated,)
-    #     # Primero obtenemos el maestro a actualizar
-    #     maestro = get_object_or_404(Maestros, id=request.data["id"])
-    #     maestro.clave_maestro = request.data["clave_maestro"]
-    #     maestro.telefono = request.data["telefono"]
-    #     maestro.rfc = request.data["rfc"]
-    #     maestro.fecha_nacimiento = request.data["fecha_nacimiento"]
-    #     maestro.materias_json = json.dumps(request.data["materias_json"])
-    #     maestro.cubiculo = request.data["cubiculo"]
-    #     maestro.area_investigacion = request.data["area_investigacion"]
-    #     maestro.save()
-    #     # Actualizamos los datos del usuario asociado (tabla auth_user de Django)
-    #     user = maestro.user
-    #     user.first_name = request.data["first_name"]
-    #     user.last_name = request.data["last_name"]
-    #     user.save()
+    # Actualizar datos del evento
+    @transaction.atomic
+    def put(self, request, *args, **kwargs):
+        permission_classes = (permissions.IsAuthenticated,)
+        # Primero obtenemos el maestro a actualizar
+        evento = get_object_or_404(Evento, id=request.data["id"])
+        evento.descripcion=request.data["descripcion"]
+        evento.fecha=request.data["fecha"]
+        evento.hora_inicio=request.data["hora_inicio"]
+        evento.hora_fin=request.data["hora_fin"]
+        evento.lugar=request.data["lugar"]
+        evento.publico_objetivo=json.dumps(request.data["publico_objetivo"])
+        evento.nombre=request.data["nombre"]
+        evento.tipo=request.data["tipo"]
+        evento.numero_participantes=request.data["numero_participantes"]
+        evento.programa_educativo= request.data["programa_educativo"]
+        evento.nombre_responsable=request.data["nombre_responsable"]
+        evento.save()
         
-    #     return Response({"message": "Maestro actualizado correctamente", "maestro": MaestrosSerializer(maestro).data}, 200)
-    # # Eliminar maestro con delete (Borrar realmente)
-    # @transaction.atomic
-    # def delete(self, request, *args, **kwargs):
-    #     permission_classes = (permissions.IsAuthenticated,)
-    #     maestro = get_object_or_404(Maestros, id=request.GET.get("id"))
-    #     try:
-    #         maestro.user.delete()
-    #         return Response({"details":"Maestro eliminado"},200)
-    #     except Exception as e:
-    #         return Response({"details":"Algo pasó al eliminar"},400)
+        return Response({"message": "Maestro actualizado correctamente", "maestro": EventoSerializer(evento).data}, 200)
+    
+    @transaction.atomic
+    def delete(self, request, *args, **kwargs):
+        permission_classes = (permissions.IsAuthenticated,)
+        evento = get_object_or_404(Evento, id=request.GET.get("id"))
+        try:
+            evento.delete()
+            return Response({"details":"Evento eliminado"},200)
+        except Exception as e:
+            
+            return Response({"details":"Algo pasó al eliminar"},400)
