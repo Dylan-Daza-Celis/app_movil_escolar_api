@@ -110,6 +110,7 @@ class MaestrosView(generics.CreateAPIView):
     # Eliminar maestro con delete (Borrar realmente)
     @transaction.atomic
     def delete(self, request, *args, **kwargs):
+        permission_classes = (permissions.IsAuthenticated,)
         maestro = get_object_or_404(Maestros, id=request.GET.get("id"))
         try:
             maestro.user.delete()

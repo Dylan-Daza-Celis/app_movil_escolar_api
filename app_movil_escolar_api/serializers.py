@@ -30,3 +30,8 @@ class MaestrosSerializer(serializers.ModelSerializer):
         model = Maestros
         fields = "__all__"
 
+class EventoSerializer(serializers.ModelSerializer):
+    id=serializers.IntegerField(read_only=True)
+    class Meta:
+        model = Evento
+        fields = "__all__"

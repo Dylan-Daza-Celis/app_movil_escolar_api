@@ -16,7 +16,7 @@ class AlumnosAll(generics.CreateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
     # Invocamos la petición GET para obtener todos los alumnos
     def get(self, request, *args, **kwargs):
-        alumnos = Alumnos.objects.filter(user__is_active = 1).order_by("id")
+        alumnos = Alumnos.objects.filter().order_by("id")
         lista = AlumnosSerializer(alumnos, many=True).data
         return Response(lista, 200)
     

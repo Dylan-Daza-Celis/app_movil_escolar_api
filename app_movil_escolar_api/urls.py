@@ -5,7 +5,7 @@ from django.conf.urls.static import static
 
 from .views.bootstrap import VersionView
 #from sistema_escolar_api.views import bootstrap
-from app_movil_escolar_api.views import users,alumno, maestro
+from app_movil_escolar_api.views import users,alumno, maestro, evento
 from app_movil_escolar_api.views import auth
 
 
@@ -16,6 +16,8 @@ urlpatterns = [
         path('alumno/', alumno.AlumnosView.as_view()),
     #Create Maestro User
         path('maestro/', maestro.MaestrosView.as_view()),
+    #Create Maestro User
+        path('evento/', evento.EventosView.as_view()),
     #Admin Data
         path('lista-admins/', users.AdminAll.as_view()),
     #Maestro Data
